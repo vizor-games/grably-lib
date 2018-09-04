@@ -55,10 +55,6 @@ module GrablyPkg
       to_s
     end
 
-    def x
-      [@lo_inc, @lo_ver, @hi_ver, @hi_inc].inspect
-    end
-
     def =~(other)
       return true if other > @lo_ver && other < @hi_ver
       return true if other == @lo_ver && @lo_inc
