@@ -1,0 +1,43 @@
+Style/AsciiComments:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'test/**/*.rb'
+    - 'spec/**/*.rb'
+
+Metrics/AbcSize:
+  Max: 50
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/MethodLength:
+  Max: 40
+
+Metrics/PerceivedComplexity:
+  Max: 15
+
+Style/HashSyntax:
+  Exclude:
+    # for task :foo => :bar definitions
+    - '**/Rakefile'
+    - '**/*.rake'
+    - '**/*.rake.rb'
+
+Style/PercentLiteralDelimiters:
+  # Specify the default preferred delimiter for all types with the 'default' key
+  # Override individual delimiters (even with default specified) by specifying
+  # an individual key
+  PreferredDelimiters:
+    default: ()
+    '%i': '()'
+    '%I': '()'
+    '%r': '{}'
+    '%w': '()'
+    '%W': '()'

@@ -1,7 +1,6 @@
-require "grably/pkg/version"
+require_relative 'pkg/version'
+require 'grably'
 
-module Grably
-  module Pkg
-    # Your code goes here...
-  end
+module GrablyPkg # :nodoc:
+  # TODO
 end

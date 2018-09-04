@@ -1,3 +1,9 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem 'grably', git: 'https://github.com/vizor-games/grably.git'
+# Use deps from gemspec
+gemspec
+
+group :dev do
+  # gem 'grably', git: 'https://github.com/vizor-games/grably.git'
+  gem 'grably', path: '../grably'
+end
