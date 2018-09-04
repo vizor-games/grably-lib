@@ -41,7 +41,7 @@ module GrablyPkg
         @hi_inc = !range.end_with?(')')
         range = range[0..-2] if range.end_with?(']', ')')
 
-        range = range.split(/\,/)
+        range = range.split(',')
         @lo_ver = range[0] == '?' ? Version.min_version : Version.new(range[0])
         @hi_ver = range[1] == '?' ? Version.max_version : Version.new(range[1])
       end
@@ -203,87 +203,11 @@ module GrablyPkg
     MAX_VERSION = Version.new('999999999999999999999999')
   end
 
-  class LibFlags # :nodoc:
-    attr_reader :flags
-
-    def initialize
-      @flags = {}
-    end
-
-    def add(flag, v = nil)
-      f = flag.chomp
-
-      if f.chomp!('+')
-        v = true if v.nil?
-        raise "flag's signature has '+' (#{flag}), but it is requested to be unset" unless v
-      elsif f.chomp!('-')
-        v = false if v.nil?
-        raise "flag's signature has '-' (#{flag}), but it is requested to be set" if v
-      end
-
-      v = true if v.nil?
-
-      raise "flag can have only one '+' or '-' at the end: #{flag}" if f.end_with?('+', '-')
-      raise "flag was already added with different value: #{flag} = #{@flags[f]}" if @flags.key?(f) && @flags[f] != v
-      @flags[f] = v
-    end
-
-    def to_set
-      f = Set.new
-      @flags.each do |k, v|
-        f << k if v
-      end
-
-      f
-    end
-
-    def merge!(f)
-      f.flags.each { |k, v| add(k, v) }
-    end
-
-    def merge(f)
-      fr = LibFlags.new
-      fr.merge!(self)
-      fr.merge!(f)
-      fr
-    end
-
-    def subset?(f)
-      to_set.subset?(f.to_set)
-    end
-
-    def compatible?(f)
-      f.flags.each do |k, v|
-        return false if @flags.key?(k) && @flags[k] != v
-      end
-      true
-    end
-
-    def to_s
-      return '' if @flags.zero?
-      s = @flags.to_a.map { |f| "#{f[0]}#{f[1] ? '+' : '-'}" }.join(',')
-      "[#{s}]"
-    end
-
-    def inspect
-      to_s
-    end
-  end
-
   class LibRangeParams # :nodoc:
-    attr_reader :name, :version, :flags
+    attr_reader :name, :version
 
     def initialize(l)
-      flags = LibFlags.new
       version = VersionRange.new_any
-
-      m = /(.+)\[(.*)\]/.match(l)
-      unless m.nil? || m[1].end_with?('-')
-        l = m[1]
-        m[2].split(/,/).each do |f|
-          flags.add(f)
-        end
-      end
 
       m = /(.+)-([^-]+)/.match(l)
       if l.start_with?('~')
@@ -321,18 +245,10 @@ module GrablyPkg
   end
 
   class LibParams # :nodoc:
-    attr_reader :name, :version, :flags
+    attr_reader :name, :version
 
     def initialize(l)
       flags = LibFlags.new
-
-      m = /(.+)\[(.*)\]/.match(l)
-      unless m.nil? || m[1].end_with?('-')
-        l = m[1]
-        m[2].split(/,/).each do |f|
-          flags.add(f)
-        end
-      end
 
       m = /(.+)-([^-]+)/.match(l)
       @name = m[1]
