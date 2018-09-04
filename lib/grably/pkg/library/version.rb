@@ -232,11 +232,10 @@ module GrablyPkg
 
       @name = l
       @version = version
-      @flags = flags
     end
 
     def to_s
-      "#{@name}-#{@version}#{@flags}"
+      "#{@name}-#{@version}"
     end
 
     def inspect
@@ -248,16 +247,13 @@ module GrablyPkg
     attr_reader :name, :version
 
     def initialize(l)
-      flags = LibFlags.new
-
       m = /(.+)-([^-]+)/.match(l)
       @name = m[1]
       @version = Version.new(m[2])
-      @flags = flags
     end
 
     def to_s
-      "#{@name}-#{@version}#{@flags}"
+      "#{@name}-#{@version}"
     end
 
     def inspect
