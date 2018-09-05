@@ -1,7 +1,7 @@
-# Grably lib
+# Grably libs
 
 Experimental Grably extension for managing
 libraries (artifacts).
 
-Grably lib is supposed to be merged into Grably's
+Grably libs is supposed to be merged into Grably's
 core later.

@@ -12,7 +12,7 @@ PATH
 PATH
   remote: .
   specs:
-    grably-pkg (0.1.0)
+    grably-libs (0.1.0)
       grably
 
 GEM
@@ -59,7 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   grably!
-  grably-pkg!
+  grably-libs!
   rspec (~> 3.5.0)
   rubocop (~> 0.50.0)
 
