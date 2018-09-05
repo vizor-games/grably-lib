@@ -2,7 +2,7 @@ require 'bundler/setup'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 
-require 'grably/pkg'
+require 'grably/lib'
 
 RSpec::Core::RakeTask.new(:spec)
 
