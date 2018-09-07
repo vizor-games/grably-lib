@@ -2,10 +2,12 @@ require 'grably'
 require_relative 'libs/version'
 require_relative 'libs/libraries'
 
+require_relative 'libs/overlay/overlay_libraries'
+
 module Grably
   module Libs # :nodoc:
     # Libraries repository.
-    # This class manages libraries providers and local cache
+    # This class manages libraries providers
     # rubocop:disable Metrics/ClassLength
     class Repository
       # Initialize repository
@@ -76,7 +78,7 @@ module Grably
 
       def build_lib(lib_desc)
         # TODO: proper implementation with cache support (or implement this in base_lib)
-        lib_desc.build(self)
+        lib_desc.build
       end
 
       def find_desc(lib_params)

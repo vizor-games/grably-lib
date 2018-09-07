@@ -9,13 +9,13 @@ module Grably
       end
 
       # Used to get runtime dependencies
-      # @return Array<LibRangeParams> - library runtime dependencies
+      # @return Array<String> - library runtime dependencies with restrictions
       def deps
         []
       end
 
       # Get library artifacts (load, build, generate, e.t.c)
-      def build(_repo)
+      def build
         []
       end
 
