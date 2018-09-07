@@ -3,9 +3,10 @@ require_relative 'libs/version'
 require_relative 'libs/libraries'
 
 module Grably
-  module Libs # :nodoc: # rubocop:disable Metrics/ModuleLength
+  module Libs # :nodoc:
     # Libraries repository.
     # This class manages libraries providers and local cache
+    # rubocop:disable Metrics/ClassLength
     class Repository
       # Initialize repository
       # @param repo_path [String] - path to local repository storage
@@ -261,7 +262,8 @@ module Grably
         lib.include?('||')
       end
 
-      def create_constraint_filter(lib, pushed) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity, Metrics/LineLength
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+      def create_constraint_filter(lib, pushed)
         if lib.include?('||')
           fs = []
           lib.split('||').each do |l|
