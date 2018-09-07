@@ -1,3 +1,5 @@
+require_relative 'library'
+
 module Grably
   module Libs
     # Libraries provider
@@ -10,13 +12,13 @@ module Grably
 
       # Get all available library versions
       # @return Array<Version>
-      def versions(_group, _name)
+      def versions(_name)
         raise 'not implemented'
       end
 
       # Get library description
       # @return Library - library description
-      def description(_group, _name, _version)
+      def description(_name, _version)
         raise 'not implemented'
       end
     end

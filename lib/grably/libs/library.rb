@@ -1,8 +1,9 @@
+require_relative 'library_version'
+
 module Grably
   module Libs # :nodoc:
     class Library # :nodoc:
-      def initialize(group, name, version)
-        @group = group
+      def initialize(name, version)
         @name = name
         @version = version
       end

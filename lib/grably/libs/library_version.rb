@@ -159,6 +159,14 @@ module Grably
         r
       end
 
+      def hash
+        to_s.hash
+      end
+
+      def eql?(other)
+        (self <=> other).zero?
+      end
+
       def inspect
         to_s
       end
@@ -187,9 +195,8 @@ module Grably
           i += 1
         end
 
-        return -1 if i >= ver1.length
-        return 1 if i >= ver2.length
-        0
+        return 0 if ver1.length == ver2.length
+        i >= ver1.length ? -1 : 1
       end
 
       def prefix(part)
@@ -201,31 +208,34 @@ module Grably
     end
 
     class LibRangeParams # :nodoc:
-      attr_reader :group, :name, :version
+      attr_reader :name, :version
 
       def initialize(l)
         version = VersionRange.new_any
 
-        m = /(.+):(.+)-([^-]+)/.match(l)
-        v = m[3]
-        if l.start_with?('~')
-          version = VersionRange.new(v)
-          l = m[1][1..-1]
-        elsif l.start_with?('=')
-          version = VersionRange.new_e(v)
-          l = m[1][1..-1]
-        elsif l.start_with?('>=')
-          version = VersionRange.new_ge(v)
-          l = m[1][2..-1]
-        elsif l.start_with?('>')
-          version = VersionRange.new_g(v)
-          l = m[1][1..-1]
-        elsif l.start_with?('<=')
-          version = VersionRange.new_le(v)
-          l = m[1][2..-1]
-        elsif l.start_with?('<')
-          version = VersionRange.new_l(v)
-          l = m[1][1..-1]
+        # TODO: rewrite this code in a proper ruby way
+        m = /(.+)-([^-]+)/.match(l)
+        if m
+          v = m[2]
+          if l.start_with?('~')
+            version = VersionRange.new(v)
+            l = m[1][1..-1]
+          elsif l.start_with?('=')
+            version = VersionRange.new_e(v)
+            l = m[1][1..-1]
+          elsif l.start_with?('>=')
+            version = VersionRange.new_ge(v)
+            l = m[1][2..-1]
+          elsif l.start_with?('>')
+            version = VersionRange.new_g(v)
+            l = m[1][1..-1]
+          elsif l.start_with?('<=')
+            version = VersionRange.new_le(v)
+            l = m[1][2..-1]
+          elsif l.start_with?('<')
+            version = VersionRange.new_l(v)
+            l = m[1][1..-1]
+          end
         end
 
         @name = l
@@ -233,11 +243,7 @@ module Grably
       end
 
       def to_s
-        "#{id}-#{@version}"
-      end
-
-      def id
-        "#{group}:#{@name}"
+        "#{@name}-#{@version}"
       end
 
       def inspect
@@ -246,21 +252,16 @@ module Grably
     end
 
     class LibParams # :nodoc:
-      attr_reader :group, :name, :version
+      attr_reader :name, :version
 
       def initialize(l)
-        m = /(.+):(.+)-([^-]+)/.match(l)
-        @group = m[1]
-        @name = m[2]
-        @version = Version.new(m[3])
+        m = /(.+)-([^-]+)/.match(l)
+        @name = m[1]
+        @version = Version.new(m[2])
       end
 
       def to_s
-        "#{id}-#{@version}"
-      end
-
-      def id
-        "#{@group}:#{@name}"
+        "#{@name}-#{@version}"
       end
 
       def inspect
