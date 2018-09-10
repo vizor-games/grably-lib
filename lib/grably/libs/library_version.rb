@@ -208,7 +208,7 @@ module Grably
     end
 
     class LibRangeParams # :nodoc:
-      attr_reader :name, :version
+      attr_reader :id, :version
 
       def initialize(l)
         version = VersionRange.new_any
@@ -238,12 +238,12 @@ module Grably
           end
         end
 
-        @name = l
+        @id = l
         @version = version
       end
 
       def to_s
-        "#{@name}-#{@version}"
+        "#{@id}-#{@version}"
       end
 
       def inspect
@@ -252,16 +252,16 @@ module Grably
     end
 
     class LibParams # :nodoc:
-      attr_reader :name, :version
+      attr_reader :id, :version
 
       def initialize(l)
         m = /(.+)-([^-]+)/.match(l)
-        @name = m[1]
+        @id = m[1]
         @version = Version.new(m[2])
       end
 
       def to_s
-        "#{@name}-#{@version}"
+        "#{@id}-#{@version}"
       end
 
       def inspect

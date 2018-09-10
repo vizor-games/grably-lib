@@ -12,13 +12,13 @@ module Grably
 
       # Get all available library versions
       # @return Array<Version>
-      def versions(_name)
+      def versions(_id)
         raise 'not implemented'
       end
 
       # Get library description
       # @return Library - library description
-      def description(_name, _version)
+      def description(_id, _version)
         raise 'not implemented'
       end
     end

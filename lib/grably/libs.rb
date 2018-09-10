@@ -77,13 +77,12 @@ module Grably
       private
 
       def build_lib(lib_desc)
-        # TODO: proper implementation with cache support (or implement this in base_lib)
-        lib_desc.build
+        lib_desc.get
       end
 
       def find_desc(lib_params)
         libs = versions(lib_params)[lib_params.version]
-        libs.nil? ? nil : libs.description(lib_params.name, lib_params.version)
+        libs.nil? ? nil : libs.description(lib_params.id, lib_params.version)
       end
 
       def description(lib_params)
@@ -95,7 +94,7 @@ module Grably
       def find_versions(lib_params)
         vs = {}
         @libs.each do |libs|
-          libs.versions(lib_params.name).each do |v|
+          libs.versions(lib_params.id).each do |v|
             vs[v] = libs unless vs.key?(v)
           end
         end
@@ -104,7 +103,7 @@ module Grably
       end
 
       def versions(lib_params)
-        k = lib_params.name
+        k = lib_params.id
         @lib_versions[k] = find_versions(lib_params) unless @lib_versions.key?(k)
         @lib_versions[k]
       end
@@ -180,18 +179,18 @@ module Grably
           end
         end
 
-        r.reject! { |a| a[:lib].name.start_with?('*') || exclude.include?(a[:lib].name) }
+        r.reject! { |a| a[:lib].id.start_with?('*') || exclude.include?(a[:lib].id) }
         r = r.map { |a| { lib: repo[a[:lib].to_s], meta: a[:meta] || {} } }
         r.compact
       end
 
-      def find_prev(added, name)
-        idx = added.index { |a| a[:lib].name == name }
+      def find_prev(added, id)
+        idx = added.index { |a| a[:lib].id == id }
         idx.nil? ? nil : added[idx]
       end
 
       def delete_prev(added, lp)
-        added.reject! { |a| a[:lib].name == lp.name }
+        added.reject! { |a| a[:lib].id == lp.id }
 
         lps = lp.to_s
 
@@ -232,7 +231,7 @@ module Grably
               libs[entry] = create_lib_entry(l.deps, entry)
             end
 
-            prev = find_prev(added, lp.name)
+            prev = find_prev(added, lp.id)
             if prev.nil?
               added << { lib: lp, pushed: p[:pushed].clone }
               changed = true
@@ -273,7 +272,7 @@ module Grably
             raise "'!' is not supported with '||' operator: #{lib}" if l.start_with?('!')
 
             lp = LibRangeParams.new(l)
-            idx = fs.index { |a| a[0].name == lp.name }
+            idx = fs.index { |a| a[0].id == lp.id }
             if idx
               fs[idx] << lp
             else
@@ -285,10 +284,10 @@ module Grably
           lambda do |libset|
             selected = nil
             fs.each do |lpa|
-              if libset.key?(lpa[0].name)
+              if libset.key?(lpa[0].id)
                 fits = false
                 lpa.each do |lp1|
-                  next unless libset[lp1.name][:libs].index { |l| l[:v] =~ lp1.version }
+                  next unless libset[lp1.id][:libs].index { |l| l[:v] =~ lp1.version }
                   selected = lpa
                   fits = true
                   break
@@ -303,12 +302,12 @@ module Grably
 
             lp = selected[0]
 
-            unless libset.key?(lp.name)
-              raise "library '#{lp.name}' not found" unless versions?(lp)
-              libset[lp.name] = { libs: versions(lp).keys.map { |v| { v: v } }, pushed: Set.new }
+            unless libset.key?(lp.id)
+              raise "library '#{lp.id}' not found" unless versions?(lp)
+              libset[lp.id] = { libs: versions(lp).keys.map { |v| { v: v } }, pushed: Set.new }
             end
 
-            libset[lp.name][:libs].select! do |l|
+            libset[lp.id][:libs].select! do |l|
               fits = false
               selected.each do |lpv|
                 # TODO: check if |= is proper code
@@ -318,7 +317,7 @@ module Grably
               fits
             end
 
-            libset[lp.name][:pushed] << pushed
+            libset[lp.id][:pushed] << pushed
           end
         else
           negate = false
@@ -330,16 +329,16 @@ module Grably
           lp = LibRangeParams.new(lib)
 
           lambda do |libset|
-            unless libset.key?(lp.name)
-              raise "library '#{lp.name}' not found" unless versions?(lp)
-              libset[lp.name] = { libs: versions(lp).keys.map { |v| { v: v } }, pushed: Set.new }
+            unless libset.key?(lp.id)
+              raise "library '#{lp.id}' not found" unless versions?(lp)
+              libset[lp.id] = { libs: versions(lp).keys.map { |v| { v: v } }, pushed: Set.new }
             end
 
             if negate
-              libset[lp.name][:libs].reject! { |l| l[:v] =~ lp.version }
+              libset[lp.id][:libs].reject! { |l| l[:v] =~ lp.version }
             else
-              libset[lp.name][:libs].select! { |l| l[:v] =~ lp.version }
-              libset[lp.name][:pushed] << pushed
+              libset[lp.id][:libs].select! { |l| l[:v] =~ lp.version }
+              libset[lp.id][:pushed] << pushed
             end
           end
         end

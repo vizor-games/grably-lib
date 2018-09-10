@@ -3,8 +3,10 @@ require_relative 'library_version'
 module Grably
   module Libs # :nodoc:
     class Library # :nodoc:
-      def initialize(name, version)
-        @name = name
+      attr_reader :id, :version
+
+      def initialize(id, version)
+        @id = id
         @version = version
       end
 
@@ -15,13 +17,12 @@ module Grably
       end
 
       # Get library artifacts (load, build, generate, e.t.c)
-      def build
+      def get
         []
       end
 
-      # Check if this library needs to be rebuilt
-      def dirty?
-        false
+      def to_s
+        "#{@id}-#{@version}"
       end
     end
   end

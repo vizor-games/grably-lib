@@ -1,3 +1,5 @@
+require_relative 'overlay_library'
+
 module Grably
   module Libs # :nodoc:
     # Local specific to grably type of libraries.
@@ -7,30 +9,31 @@ module Grably
         @overlay_path = File.expand_path(overlay_path)
       end
 
-      def versions(name)
-        m = /(.+):(.+)/.match(name)
-        raise "wrong library name: #{name}" if m.nil?
-        dir = desc_dir(name)
+      def versions(id)
+        m = /(.+):(.+)/.match(id)
+        raise "wrong library id: #{id}" if m.nil?
+        group = m[1]
+        name = m[2]
+
+        dir = desc_dir(id)
         return [] unless File.exist?(dir)
-        id = m[2]
-        vs = Dir.glob(File.join(dir, "#{id}-*.rb")).map do |f|
-          LibParams.new(File.basename(f, '.rb'))
+        vs = Dir.glob(File.join(dir, "#{name}-*.rb")).map do |f|
+          LibParams.new("#{group}:#{File.basename(f, '.rb')}")
         end
 
-        vs.each { |v| raise "wrong directory structure for: #{name}" unless v.name == id }
+        vs.each { |v| raise "wrong directory structure for: #{id}" unless v.id == id }
 
         vs.map(&:version)
       end
 
-      def description(name, version)
-        # TODO: add code
-        Library.new(name, version)
+      def description(id, version)
+        OverlayLibrary.new(id, version, desc_dir(id), @repo)
       end
 
       private
 
-      def desc_dir(name)
-        File.join(@overlay_path, name.split(/[.:]/))
+      def desc_dir(id)
+        File.join(@overlay_path, id.split(/[.:]/))
       end
     end
   end
