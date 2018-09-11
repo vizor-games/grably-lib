@@ -2,7 +2,9 @@ require_relative 'providers'
 
 module Grably
   module Libs
-    class OverlayLibrary < Library # :nodoc:
+    # rubocop:disable Metrics/ClassLength
+    # :nodoc:
+    class OverlayLibrary < Library
       include FileUtils
 
       def initialize(id, version, desc, repo)
@@ -93,7 +95,7 @@ module Grably
             end
           end
 
-          log_msg "Building library ".yellow + @name.yellow.bright
+          log_msg 'Building library '.yellow + @name.yellow.bright
 
           # Recreate tmp folder
           t = tmp_path
@@ -101,26 +103,26 @@ module Grably
           mkdir_p(t)
 
           # Build steps
-          log_msg "* Fetching"
+          log_msg '* Fetching'
           fetch
 
-          log_msg "* Unpacking"
+          log_msg '* Unpacking'
           unpack
 
-          if self.respond_to? :patch
-            log_msg "* Patching"
+          if respond_to? :patch
+            log_msg '* Patching'
             patch
           end
 
-          if self.respond_to? :compile
-            log_msg "* Compiling"
+          if respond_to? :compile
+            log_msg '* Compiling'
             compile
           end
 
           # Install
           rm_rf(lib_path)
           mkdir_p(lib_path)
-          files = Grably::cp(@install, lib_path)
+          files = Grably.cp(@install, lib_path)
           files.map! { |f| f.update(lib_name: @name, lib_version: @version) }
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
@@ -174,13 +176,13 @@ module Grably
 
       def unpack_all(mask)
         Dir.glob(tmp_path('build', mask)) do |f|
-          Grably::unpack(f, File.dirname(f))
+          Grably.unpack(f, File.dirname(f))
           rm(f)
         end
       end
 
       def unpack
-        unpack_all("*.{zip,gz,tgz}")
+        unpack_all('*.{zip,gz,tgz}')
       end
     end
   end

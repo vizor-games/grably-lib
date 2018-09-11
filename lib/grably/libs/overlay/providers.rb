@@ -2,7 +2,7 @@ require_relative 'commands'
 
 module Grably
   module Libs
-    module Provider
+    module Provider # :nodoc:
       class << self
         def included(receiver)
           providers << receiver

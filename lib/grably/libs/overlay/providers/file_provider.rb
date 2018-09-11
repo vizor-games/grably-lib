@@ -1,6 +1,6 @@
 module Grably
   module Libs
-    class FileProvider
+    class FileProvider # :nodoc:
       attr_reader :filename
 
       def initialize(filename)

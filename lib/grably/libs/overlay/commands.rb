@@ -1,9 +1,9 @@
 require 'open-uri'
 require 'openssl'
 
-module OpenURI
+module OpenURI # :nodoc:
   class << self
-    alias_method :redirectable_cautious?, :redirectable?
+    alias redirectable_cautious? redirectable?
 
     def redirectable?(uri1, uri2)
       redirectable_cautious?(uri1, uri2) || http_to_https?(uri1, uri2) || https_to_http?(uri1, uri2)
@@ -24,7 +24,7 @@ module OpenURI
 end
 
 module Grably
-  module Libs
+  module Libs # :nodoc:
     module_function
 
     # progress can be: false, true or :delayed
@@ -58,11 +58,16 @@ module Grably
           shown = true
         end
 
-        params = { :read_timeout => 10, content_length_proc: cl_proc, progress_proc: p_proc, :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE }.merge(params)
+        params = {
+          read_timeout: 10,
+          content_length_proc: cl_proc,
+          progress_proc: p_proc,
+          ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE
+        }.merge(params)
 
         stream = open(url, params)
 
-        File.open(path, "w") do |f|
+        File.open(path, 'w') do |f|
           IO.copy_stream(stream, f)
         end
 

@@ -2,7 +2,7 @@ require_relative 'file_provider'
 
 module Grably
   module Libs
-    class HttpProvider < FileProvider
+    class HttpProvider < FileProvider # :nodoc:
       include Provider
       include Libs
 

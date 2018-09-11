@@ -2,12 +2,12 @@ require_relative 'http_provider'
 
 module Grably
   module Libs
-    class GithubProvider < HttpProvider
+    class GithubProvider < HttpProvider # :nodoc:
       def initialize(p = {})
         project = p.delete(:project)
         revision = p.delete(:rev)
         filename = "github-#{project.split('/').join('-')}-#{revision.split('/').join('-')}.tar.gz"
-        super(:url => "https://github.com/#{project}/tarball/#{revision}", :filename => filename)
+        super(url: "https://github.com/#{project}/tarball/#{revision}", filename: filename)
       end
 
       def fetch(tmp_dir)
