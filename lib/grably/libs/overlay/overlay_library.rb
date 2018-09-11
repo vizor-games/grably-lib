@@ -1,3 +1,5 @@
+require_relative 'providers'
+
 module Grably
   module Libs
     class OverlayLibrary < Library # :nodoc:
@@ -13,7 +15,7 @@ module Grably
 
         @slot = 'bin'
         @install = []
-        @work_dir = tmp_path
+        @work_dir = ''
 
         @desc = File.join(File.expand_path(desc), "#{full_name}.rb")
       end
@@ -30,6 +32,10 @@ module Grably
 
       def tmp_path(*path)
         @repo.repo_path('overlay', 'tmp', *path)
+      end
+
+      def work_path(*path)
+        tmp_path('build', @work_dir, *path)
       end
 
       def lib_path(*path)
@@ -103,6 +109,8 @@ module Grably
           files.map! { |f| f.update(lib_name: @name, lib_version: @version) }
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
+
+          FileUtils.rm_rf(t)
         end
 
         load_obj(result_file)
@@ -117,12 +125,39 @@ module Grably
       end
 
       def fetch
-        # TODO: implement
+        Provider.providers.each do |provider|
+          params = instance_variable_get(provider.config_var)
+          next if params.nil?
+
+          params = [params] unless params.is_a?(Array)
+          params.each do |param|
+            param = param.clone
+
+            dir = param.delete(:dir) if param.is_a?(Hash)
+            dir ||= ''
+
+            p = provider.new(param)
+            dist_file = @repo.repo_path('overlay', 'dist', p.filename)
+            unless File.exist?(dist_file)
+              tmp_dist_dir = tmp_path('download')
+              tmp_dist_file = File.join(tmp_dist_dir, p.filename)
+              FileUtils.mkdir_p(tmp_dist_dir)
+              p.fetch(tmp_dist_dir)
+
+              raise 'internal error' unless File.exist?(tmp_dist_file)
+              FileUtils.mkdir_p(File.dirname(dist_file))
+              FileUtils.mv(tmp_dist_file, dist_file)
+              FileUtils.rm_rf(tmp_dist_dir)
+            end
+
+            FileUtils.ln(dist_file, tmp_path('build', dir))
+          end
+        end
       end
 
       def unpack_all(mask)
-        Dir.glob(tmp_path(mask)) do |f|
-          Grably::unpack(f, tmp_path)
+        Dir.glob(tmp_path('build', mask)) do |f|
+          Grably::unpack(f, File.dirname(f))
           FileUtils.rm(f)
         end
       end
