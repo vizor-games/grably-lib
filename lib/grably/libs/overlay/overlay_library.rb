@@ -3,6 +3,8 @@ require_relative 'providers'
 module Grably
   module Libs
     class OverlayLibrary < Library # :nodoc:
+      include FileUtils
+
       def initialize(id, version, desc, repo)
         super(id, version)
 
@@ -18,6 +20,19 @@ module Grably
         @work_dir = ''
 
         @desc = File.join(File.expand_path(desc), "#{full_name}.rb")
+
+        begin
+          instance_eval(IO.read(@desc))
+        rescue StandardError => e
+          log_msg "error in build script for library: #{id}-#{version}"
+          raise e
+        end
+
+        setup
+      end
+
+      def setup
+        # do nothing by default
       end
 
       attr_reader :name, :group, :slot
@@ -82,8 +97,8 @@ module Grably
 
           # Recreate tmp folder
           t = tmp_path
-          FileUtils.rm_rf(t)
-          FileUtils.mkdir_p(t)
+          rm_rf(t)
+          mkdir_p(t)
 
           # Build steps
           log_msg "* Fetching"
@@ -103,14 +118,14 @@ module Grably
           end
 
           # Install
-          FileUtils.rm_rf(lib_path)
-          FileUtils.mkdir_p(lib_path)
+          rm_rf(lib_path)
+          mkdir_p(lib_path)
           files = Grably::cp(@install, lib_path)
           files.map! { |f| f.update(lib_name: @name, lib_version: @version) }
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
 
-          FileUtils.rm_rf(t)
+          rm_rf(t)
         end
 
         load_obj(result_file)
@@ -126,7 +141,7 @@ module Grably
 
       def fetch
         Provider.providers.each do |provider|
-          params = instance_variable_get(provider.config_var)
+          params = instance_variable_get("@#{provider.config_var}")
           next if params.nil?
 
           params = [params] unless params.is_a?(Array)
@@ -141,16 +156,18 @@ module Grably
             unless File.exist?(dist_file)
               tmp_dist_dir = tmp_path('download')
               tmp_dist_file = File.join(tmp_dist_dir, p.filename)
-              FileUtils.mkdir_p(tmp_dist_dir)
+              mkdir_p(tmp_dist_dir)
               p.fetch(tmp_dist_dir)
 
               raise 'internal error' unless File.exist?(tmp_dist_file)
-              FileUtils.mkdir_p(File.dirname(dist_file))
-              FileUtils.mv(tmp_dist_file, dist_file)
-              FileUtils.rm_rf(tmp_dist_dir)
+              mkdir_p(File.dirname(dist_file))
+              mv(tmp_dist_file, dist_file)
+              rm_rf(tmp_dist_dir)
             end
 
-            FileUtils.ln(dist_file, tmp_path('build', dir))
+            dest_dir = tmp_path('build', dir)
+            mkdir_p(dest_dir)
+            ln(dist_file, File.join(dest_dir, p.filename))
           end
         end
       end
@@ -158,7 +175,7 @@ module Grably
       def unpack_all(mask)
         Dir.glob(tmp_path('build', mask)) do |f|
           Grably::unpack(f, File.dirname(f))
-          FileUtils.rm(f)
+          rm(f)
         end
       end
 

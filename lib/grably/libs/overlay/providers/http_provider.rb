@@ -1,9 +1,10 @@
-require 'file_provider'
+require_relative 'file_provider'
 
 module Grably
   module Libs
     class HttpProvider < FileProvider
       include Provider
+      include Libs
 
       require 'uri'
 

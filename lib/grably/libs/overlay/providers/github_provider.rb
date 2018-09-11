@@ -1,4 +1,4 @@
-require 'http_provider'
+require_relative 'http_provider'
 
 module Grably
   module Libs
