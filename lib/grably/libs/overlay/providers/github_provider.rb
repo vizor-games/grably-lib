@@ -3,6 +3,8 @@ require_relative 'http_provider'
 module Grably
   module Libs
     class GithubProvider < HttpProvider # :nodoc:
+      include Provider
+
       def initialize(p = {})
         project = p.delete(:project)
         revision = p.delete(:rev)
@@ -22,7 +24,7 @@ module Grably
         dirs = Dir.glob(File.join(unp_dir, '*'))
         raise 'there should be only one dir in archive' unless dirs.size == 1
 
-        pack(File.join(unp_dir, dirs[0]), fn)
+        pack(dirs[0], fn)
       end
 
       def self.config_var

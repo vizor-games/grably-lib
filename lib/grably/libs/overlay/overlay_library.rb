@@ -166,7 +166,7 @@ module Grably
 
       def install_lib(lib, src = nil)
         lib = expand_w(lib)
-        raise 'only one build artefact is supported' unless lib.size == 1
+        raise 'only one build artifact is supported' unless lib.size == 1
         lib = lib[0]
 
         unless src.nil?
