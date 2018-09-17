@@ -19,7 +19,6 @@ module Grably
         @group = m[1]
         @name = m[2]
 
-        @slot = 'bin'
         @install = []
         @work_dir = ''
 
@@ -33,13 +32,19 @@ module Grably
         end
 
         setup
+
+        @lib_path = @repo.repo_path('overlay', 'files', slot, @group.split('.'), @name)
       end
 
       def setup
         # do nothing by default
       end
 
-      attr_reader :name, :group, :slot
+      attr_reader :name, :group
+
+      def slot
+        @slot ||= 'bin'
+      end
 
       def full_name
         "#{@name}-#{@version}"
@@ -60,7 +65,7 @@ module Grably
       alias w work_path
 
       def lib_path(*path)
-        @repo.repo_path('overlay', 'files', slot, *path)
+        File.join(@lib_path, *path)
       end
 
       def result_file
