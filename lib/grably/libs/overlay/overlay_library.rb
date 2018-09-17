@@ -1,4 +1,5 @@
 require_relative 'providers'
+require_relative 'library_commands'
 
 module Grably
   module Libs
@@ -6,6 +7,7 @@ module Grably
     # :nodoc:
     class OverlayLibrary < Library
       include FileUtils
+      include LibCommands
 
       def initialize(id, version, desc, repo)
         super(id, version)
@@ -55,6 +57,8 @@ module Grably
         tmp_path('build', @work_dir, *path)
       end
 
+      alias w work_path
+
       def lib_path(*path)
         @repo.repo_path('overlay', 'files', slot, *path)
       end
@@ -83,7 +87,18 @@ module Grably
         r.uniq
       end
 
-      def get
+      def get_deps(*list)
+        return @bdeps_resolved if list.empty?
+
+        r = []
+        list.flatten.each do |l|
+          r << (@bdeps_by_name[l] || raise("library #{l} is not found in deps list"))
+        end
+
+        r.flatten
+      end
+
+      def get # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         if dirty?
           @bdeps_resolved = @repo.get(@bdeps, @name)
           @bdeps_by_name = {}
@@ -119,11 +134,18 @@ module Grably
             compile
           end
 
+          log_msg '* Installing'
+          install
+
           # Install
           rm_rf(lib_path)
           mkdir_p(lib_path)
-          files = Grably.cp(@install, lib_path)
-          files.map! { |f| f.update(lib_name: @name, lib_version: @version) }
+          files = Grably.cp(expand_w(@install), lib_path)
+          files.map! do |f|
+            v = { lib_name: @name, lib_version: @version }
+            v[:src] = Grably.cp(f[:src], lib_path) if f[:src]
+            f.update(v)
+          end
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
 
@@ -137,8 +159,22 @@ module Grably
         digest(@desc) != load_obj(digest_file)
       end
 
-      def install(src)
-        @install << src
+      def install_lib(lib, src = nil)
+        lib = expand_w(lib)
+        raise 'only one build artefact is supported' unless lib.size == 1
+        lib = lib[0]
+
+        unless src.nil?
+          src = expand_w(src)
+          raise 'only one source file supported' unless src.size == 1
+          lib = lib.update(src: src[0])
+        end
+
+        @install << lib
+      end
+
+      def install
+        raise 'really nothing to install ?'
       end
 
       def fetch
@@ -187,3 +223,5 @@ module Grably
     end
   end
 end
+
+require_relative 'extensions/javac_lib'
