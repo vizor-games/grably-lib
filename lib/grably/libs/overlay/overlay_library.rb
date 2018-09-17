@@ -105,7 +105,7 @@ module Grably
 
       def get # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         if dirty?
-          @bdeps_resolved = @repo.get(@bdeps, @name)
+          @bdeps_resolved = @repo.get(build_deps, @name)
           @bdeps_by_name = {}
           @bdeps_resolved.each do |s|
             k = s[:lib_name]
