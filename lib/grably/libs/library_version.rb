@@ -152,10 +152,14 @@ module Grably
       end
 
       def to_s
-        r = @ver * '.'
-        r += '.' + SUBVERSIONS_BACK[@type].to_s + @type_ver.to_s if SUBVERSIONS_BACK.key?(@type)
-        r += '.r' + @rev.to_s if @rev != 0
-        r += '.p' + @patch.to_s if @patch != 0
+        join('.')
+      end
+
+      def join(s)
+        r = @ver * s
+        r += "#{s}#{SUBVERSIONS_BACK[@type]}#{@type_ver}" if SUBVERSIONS_BACK.key?(@type)
+        r += "#{s}r#{@rev}" if @rev != 0
+        r += "#{s}p#{@patch}" if @patch != 0
         r
       end
 
