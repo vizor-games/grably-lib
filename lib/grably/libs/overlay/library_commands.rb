@@ -2,6 +2,7 @@ module Grably
   module Libs
     module LibCommands # :nodoc:
       require 'fileutils'
+      require_relative 'patch'
 
       def mkdir_w(path)
         FileUtils.mkdir_p([path].flatten.map { |p| w(p) })
@@ -36,6 +37,10 @@ module Grably
 
       def glob_w(pattern)
         Dir.glob_base(pattern, w)
+      end
+
+      def patch_w(patch, strip_path = 1)
+        Libs::Patch.patch(desc_path(patch), w, strip_path)
       end
     end
   end
