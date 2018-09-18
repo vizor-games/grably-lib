@@ -10,10 +10,7 @@ module Grably
       end
 
       def versions(id)
-        m = /(.+):(.+)/.match(id)
-        raise "wrong library id: #{id}" if m.nil?
-        group = m[1]
-        name = m[2]
+        group, name = parse_id(id)
 
         dir = desc_dir(id)
         return [] unless File.exist?(dir)
@@ -32,8 +29,16 @@ module Grably
 
       private
 
+      def parse_id(id)
+        m = /(.+):(.+)/.match(id)
+        raise "wrong library id: #{id}" if m.nil?
+        # group, name
+        [m[1], m[2]]
+      end
+
       def desc_dir(id)
-        File.join(@overlay_path, id.split(/[.:]/))
+        group, name = parse_id(id)
+        File.join(@overlay_path, group.split(/\./), name)
       end
     end
   end

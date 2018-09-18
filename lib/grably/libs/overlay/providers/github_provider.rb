@@ -7,7 +7,7 @@ module Grably
 
       def initialize(p = {})
         project = p.delete(:project)
-        revision = p.delete(:rev)
+        revision = p.delete(:rev).to_s
         filename = "github-#{project.split('/').join('-')}-#{revision.split('/').join('-')}.tar.gz"
         super(url: "https://github.com/#{project}/tarball/#{revision}", filename: filename)
       end

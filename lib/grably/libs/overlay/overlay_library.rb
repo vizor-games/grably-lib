@@ -97,7 +97,7 @@ module Grably
 
         r = []
         list.flatten.each do |l|
-          r << (@bdeps_by_name[l] || raise("library #{l} is not found in deps list"))
+          r << (@bdeps_by_id[l] || raise("library #{l} is not found in deps list"))
         end
 
         r.flatten
@@ -105,13 +105,13 @@ module Grably
 
       def get # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         if dirty?
-          @bdeps_resolved = @repo.get(build_deps, @name)
-          @bdeps_by_name = {}
+          @bdeps_resolved = @repo.get(build_deps, @id)
+          @bdeps_by_id = {}
           @bdeps_resolved.each do |s|
-            k = s[:lib_name]
+            k = s[:lib_id]
             unless k.nil?
-              @bdeps_by_name[k] = [] unless @bdeps_by_name.key?(k)
-              @bdeps_by_name[k] << s
+              @bdeps_by_id[k] = [] unless @bdeps_by_id.key?(k)
+              @bdeps_by_id[k] << s
             end
           end
 
@@ -147,9 +147,7 @@ module Grably
           mkdir_p(lib_path)
           files = Grably.cp(expand_w(@install), lib_path)
           files.map! do |f|
-            v = { lib_name: @name, lib_version: @version }
-            v[:src] = Grably.cp(f[:src], lib_path) if f[:src]
-            f.update(v)
+            f[:src] ? f.update(src: Grably.cp(f[:src], lib_path)) : f
           end
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
@@ -157,7 +155,9 @@ module Grably
           rm_rf(t)
         end
 
-        load_obj(result_file)
+        load_obj(result_file).map do |f|
+          f.update(lib_id: @id, lib_group: @group, lib_name: @name, lib_version: @version)
+        end
       end
 
       def dirty?
@@ -230,3 +230,6 @@ module Grably
 end
 
 require_relative 'extensions/javac_lib'
+require_relative 'extensions/groovy_lib'
+require_relative 'extensions/jar_lib'
+require_relative 'extensions/virtual_lib'
