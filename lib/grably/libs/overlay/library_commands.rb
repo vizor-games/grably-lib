@@ -25,9 +25,8 @@ module Grably
       end
 
       def preprocess_w(src, dst = nil, rm_src = nil)
-        dst = src if dst.nil?
         data = yield(IO.read(w(src)))
-        File.open(w(dst), 'w') do |f|
+        File.open(w(dst.nil? ? src : dst), 'w') do |f|
           f.print(data)
         end
 
