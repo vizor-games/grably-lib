@@ -11,11 +11,14 @@ module Grably
         REMOVED_PATTERN = /^-(.*)/m
         UNCHANGED_PATTERN = /^ (.*)/m
 
+        # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+        # rubocop:disable Metrics/MethodLength, Metrics/PerceivedComplexity
         def patch(patch_file, path, strip_path)
           files = {}
           file = nil
           chunk = nil
 
+          # rubocop:disable Metrics/BlockLength
           IO.readlines(patch_file).each do |line|
             if (m = OLD_FILE_PATTERN.match(line)) || (m = NEW_FILE_PATTERN.match(line))
               name = m[1]
@@ -45,19 +48,19 @@ module Grably
             end
           end
 
-          files.each do |k,f|
+          files.each_value do |f|
             patched_file = File.join(path, f[:name])
             lines = IO.readlines(patched_file)
             new_lines = []
             last_src = 0
 
-            f[:chunks].each do |chunk|
-              ob = chunk[:old_begin]
+            f[:chunks].each do |c|
+              ob = c[:old_begin]
               new_lines += lines[last_src..ob - 1] if last_src < ob
               last_src = ob
-              raise 'error applying patch' unless new_lines.size == chunk[:new_begin]
+              raise 'error applying patch' unless new_lines.size == c[:new_begin]
 
-              chunk[:lines].each do |line|
+              c[:lines].each do |line|
                 type, line = line
                 case type
                 when :added
@@ -77,8 +80,8 @@ module Grably
 
             new_lines += lines[last_src..lines.size - 1] if last_src < lines.size
 
-            File.open(patched_file, 'w') do |f|
-              new_lines.each { |l| f.print(l) }
+            File.open(patched_file, 'w') do |of|
+              new_lines.each { |l| of.print(l) }
             end
           end
         end
