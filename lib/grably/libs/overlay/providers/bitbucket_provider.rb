@@ -7,7 +7,7 @@ module Grably
 
       def initialize(p = {})
         super('bitbucket', p) do |project, revision|
-          "https://bitbucket.org/#{project}/get/#{revision}"
+          "https://bitbucket.org/#{project}/get/#{revision}.tar.gz"
         end
       end
 
