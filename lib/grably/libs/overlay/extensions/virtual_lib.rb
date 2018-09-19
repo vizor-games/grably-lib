@@ -1,6 +1,6 @@
 module Grably
   module Libs
-    module VirutalLib # :nodoc:
+    module VirtualLib # :nodoc:
       def setup
         super
 
