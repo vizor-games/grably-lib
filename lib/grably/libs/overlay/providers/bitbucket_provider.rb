@@ -2,17 +2,17 @@ require_relative 'bundle_provider'
 
 module Grably
   module Libs
-    class GithubProvider < BundleProvider # :nodoc:
+    class BitbucketProvider < BundleProvider # :nodoc:
       include Provider
 
       def initialize(p = {})
-        super('github', p) do |project, revision|
-          "https://github.com/#{project}/tarball/#{revision}"
+        super('bitbucket', p) do |project, revision|
+          "https://bitbucket.org/#{project}/get/#{revision}"
         end
       end
 
       def self.config_var
-        'github'
+        'bitbucket'
       end
     end
   end

@@ -19,3 +19,4 @@ end
 require_relative 'providers/file_provider'
 require_relative 'providers/http_provider'
 require_relative 'providers/github_provider'
+require_relative 'providers/bitbucket_provider'
