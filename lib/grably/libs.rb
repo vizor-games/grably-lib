@@ -24,8 +24,10 @@ module Grably
       end
 
       def add_libs(libs)
-        @libs << libs
-        libs.init(self)
+        libs = [libs].flatten
+        @libs += libs
+        libs.each { |l| l.init(self) }
+        self
       end
 
       alias add add_libs
@@ -344,5 +346,9 @@ module Grably
         end
       end
     end
+  end
+
+  def repository(repo_path = nil)
+    Libs::Repository.new(repo_path)
   end
 end

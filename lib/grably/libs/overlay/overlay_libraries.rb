@@ -42,4 +42,8 @@ module Grably
       end
     end
   end
+
+  def overlay_libs(*paths)
+    paths.map { |path| Libs::OverlayLibraries.new(path) }
+  end
 end
