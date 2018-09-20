@@ -111,7 +111,7 @@ module Grably
       attr_reader :ver, :type, :type_ver, :rev, :patch
 
       def initialize(ver)
-        parts = ver.split(/\./)
+        parts = ver.split(/\./).map { |s| s.delete('-') }
 
         @patch = 0
         @patch = Integer(parts.pop[1..-1]) if prefix(parts.last) == 'p'
