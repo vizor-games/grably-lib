@@ -1,6 +1,6 @@
 require_relative 'overlay_library'
 
-module Grably
+module Grably # :nodoc:
   module Libs # :nodoc:
     # Local specific to grably type of libraries.
     # Libraries are compiled/downloaded using special .rb descriptions.

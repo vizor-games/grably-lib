@@ -3,8 +3,9 @@ require_relative 'libs/version'
 require_relative 'libs/libraries'
 
 require_relative 'libs/overlay/overlay_libraries'
+require_relative 'libs/maven/maven_libraries'
 
-module Grably
+module Grably # :nodoc:
   module Libs # :nodoc:
     # Libraries repository.
     # This class manages libraries providers
