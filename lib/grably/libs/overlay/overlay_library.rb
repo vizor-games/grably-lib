@@ -147,7 +147,7 @@ module Grably
           mkdir_p(lib_path)
           files = Grably.cp(expand_w(@install), lib_path)
           files.map! do |f|
-            f[:src] ? f.update(src: Grably.cp(f[:src], lib_path)) : f
+            f[:src] ? f.update(src: Grably.cp(f[:src], lib_path)[0]) : f
           end
           save_obj(result_file, files)
           save_obj(digest_file, digest(@desc))
@@ -196,6 +196,7 @@ module Grably
 
             p = provider.new(param)
             dist_file = @repo.repo_path('overlay', 'dist', p.filename)
+
             unless File.exist?(dist_file)
               tmp_dist_dir = tmp_path('download')
               tmp_dist_file = File.join(tmp_dist_dir, p.filename)
