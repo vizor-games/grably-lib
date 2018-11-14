@@ -129,6 +129,11 @@ module Grably
           log_msg '* Unpacking'
           unpack
 
+          if respond_to? :pre_build
+            log_msg '* Pre build'
+            pre_build
+          end
+
           if respond_to? :patch
             log_msg '* Patching'
             patch
@@ -137,6 +142,11 @@ module Grably
           if respond_to? :compile
             log_msg '* Compiling'
             compile
+          end
+
+          if respond_to? :post_build
+            log_msg '* Post build'
+            post_build
           end
 
           log_msg '* Installing'
