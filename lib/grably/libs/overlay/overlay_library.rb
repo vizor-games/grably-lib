@@ -130,7 +130,7 @@ module Grably
           unpack
 
           if respond_to? :pre_build
-            log_msg '* Pre build'
+            log_msg '* Prebuild'
             pre_build
           end
 
@@ -145,7 +145,7 @@ module Grably
           end
 
           if respond_to? :post_build
-            log_msg '* Post build'
+            log_msg '* Postbuild'
             post_build
           end
 
