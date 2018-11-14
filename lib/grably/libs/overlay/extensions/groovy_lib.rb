@@ -34,7 +34,10 @@ module Grably
 
         compiler_cp = classpath(get_deps('org.codehaus.groovy:groovy'))
 
-        cmd = [java_cmd, '-cp', compiler_cp, 'org.codehaus.groovy.tools.FileSystemCompiler', cp]
+        jcmd = [java_cmd]
+        jcmd += ['--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.base/java.lang.invoke=ALL-UNNAMED'] if java_version >= 9
+
+        cmd = [jcmd, '-cp', compiler_cp, 'org.codehaus.groovy.tools.FileSystemCompiler', cp]
         cmd += ['-j'] if @joint
         cmd += ['-d', w(@build_dir), "@#{srcs_tmp}"]
         cmd.run
