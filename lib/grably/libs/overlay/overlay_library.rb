@@ -33,7 +33,7 @@ module Grably
 
         setup
 
-        @lib_path = @repo.repo_path('overlay', 'files', slot, @group.split('.'), @name)
+        @lib_path = @repo.repo_path('overlay', 'files', slot, @group.split('.'), @name, @version.to_s)
       end
 
       def setup
