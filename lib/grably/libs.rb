@@ -45,7 +45,10 @@ module Grably # :nodoc:
 
         # Print info messages if supported
         libs.each do |l|
-          l[:lib].info_do if l[:lib].respond_to?(:info_do)
+          if l[:lib].respond_to?(:info)
+            log_msg "* #{l[:lib].full_id}".yellow
+            l[:lib].info
+          end
         end
 
         r = []
